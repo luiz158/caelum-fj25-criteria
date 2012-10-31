@@ -17,4 +17,7 @@ public class DAO<T> {
 		this.entityManager.persist(t);
 	}
 	
+	public T find(Long id) {
+		return this.entityManager.find(clazz, id);
+	}
 }
