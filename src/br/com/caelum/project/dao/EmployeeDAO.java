@@ -7,6 +7,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import br.com.caelum.project.model.Employee;
@@ -40,7 +42,7 @@ public class EmployeeDAO {
 		return query.getSingleResult();
 	}
 
-	public List<Employee> findByFilter(String departmentName, String cityName) {
+	public List<Employee> findByFilter_WithParse(String departmentName, String cityName) {
 		String stringQuery = 
 			"select " +
 			"	e " +
@@ -81,8 +83,49 @@ public class EmployeeDAO {
 		return query.getResultList();
 	}
 
+	public List<Employee> findByFilter_WithCriteria(String departmentName, String cityName) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Employee> cq = cb.createQuery(Employee.class);
+		Root<Employee> emp = cq.from(Employee.class);
+		cq.select(emp);
+		cq.distinct(true);
+		
+		List<Predicate> criteria = new ArrayList<Predicate>();
+		
+		if(cityName != null) {
+			ParameterExpression<String> p = cb.parameter(String.class, "city");
+			criteria.add(cb.equal(emp.get("city"), p));
+		}
+		if(departmentName != null) {
+			ParameterExpression<String> p = cb.parameter(String.class, "name");
+			criteria.add(cb.equal(emp.get("department").get("name"), p));
+		}
+		
+		if (criteria.size() == 0) {
+			throw new RuntimeException("no criteria");
+		}
+		else if(criteria.size() == 1) {
+			cq.where(criteria.get(0));
+		}
+		else {
+			cq.where(cb.and(criteria.toArray(new Predicate[0])));
+		}
+		
+		TypedQuery<Employee> query = entityManager.createQuery(cq);
+		
+		if(departmentName != null) {
+			query.setParameter("name", departmentName);
+		}
+		if(cityName != null) {
+			query.setParameter("city", cityName);
+		}
+			
+		return query.getResultList();
+	}
+	
 	public void add(Employee john) {
 		this.dao.add(john);
 	}
+
 
 }

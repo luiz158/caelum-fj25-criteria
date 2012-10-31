@@ -74,7 +74,7 @@ public class EmployeeDAOTest {
 		employeeDAO.add(michael);
 		employeeDAO.add(drake);
 		
-		List<Employee> employees = employeeDAO.findByFilter(null, null);
+		List<Employee> employees = employeeDAO.findByFilter_WithParse(null, null);
 		
 		assertEquals(4, employees.size());
 	}
@@ -99,7 +99,58 @@ public class EmployeeDAOTest {
 		employeeDAO.add(michael);
 		employeeDAO.add(drake);
 		
-		List<Employee> employees = employeeDAO.findByFilter("IT", null);
+		List<Employee> employees = employeeDAO.findByFilter_WithParse("IT", null);
+		
+		assertEquals(2, employees.size());
+	}
+	
+	@Test
+	public void shouldBeReturnedAnEmployeeUsingFilterCityAndDeparment_NiceWay() throws Exception {
+		Department technologyDepartment = new Department("IT"); 
+		Employee john = new EmployeeBuilder().named("John").inDepartment(technologyDepartment).inCity("Irvine").buid();
+		Employee alex = new EmployeeBuilder().named("Alex").inDepartment(technologyDepartment).inCity("Berkley").buid();
+		
+		Department marketingDepartment = new Department("Marketing");
+		Employee michael = new EmployeeBuilder().named("Michael").inDepartment(marketingDepartment).inCity("Irvine").buid();
+		Employee drake = new EmployeeBuilder().named("Drake").inDepartment(marketingDepartment).inCity("Berkley").buid();
+		
+		DepartmentDAO departmentDAO = new DepartmentDAO(entityManager);
+		departmentDAO.add(technologyDepartment);
+		departmentDAO.add(marketingDepartment);
+		
+		EmployeeDAO employeeDAO = new EmployeeDAO(entityManager);
+		employeeDAO.add(john);
+		employeeDAO.add(alex);
+		employeeDAO.add(michael);
+		employeeDAO.add(drake);
+		
+		List<Employee> employees = employeeDAO.findByFilter_WithCriteria("IT", "Irvine");
+		
+		assertEquals(1, employees.size());
+		assertEquals("John", employees.get(0).getName());
+	}
+	
+	@Test
+	public void shouldBeReturnedAnEmployeeUsingFilterDeparment_NiceWay() throws Exception {
+		Department technologyDepartment = new Department("IT"); 
+		Employee john = new EmployeeBuilder().named("John").inDepartment(technologyDepartment).inCity("Irvine").buid();
+		Employee alex = new EmployeeBuilder().named("Alex").inDepartment(technologyDepartment).inCity("Berkley").buid();
+		
+		Department marketingDepartment = new Department("Marketing");
+		Employee michael = new EmployeeBuilder().named("Michael").inDepartment(marketingDepartment).inCity("Irvine").buid();
+		Employee drake = new EmployeeBuilder().named("Drake").inDepartment(marketingDepartment).inCity("Berkley").buid();
+		
+		DepartmentDAO departmentDAO = new DepartmentDAO(entityManager);
+		departmentDAO.add(technologyDepartment);
+		departmentDAO.add(marketingDepartment);
+		
+		EmployeeDAO employeeDAO = new EmployeeDAO(entityManager);
+		employeeDAO.add(john);
+		employeeDAO.add(alex);
+		employeeDAO.add(michael);
+		employeeDAO.add(drake);
+		
+		List<Employee> employees = employeeDAO.findByFilter_WithCriteria("IT", null);
 		
 		assertEquals(2, employees.size());
 	}
