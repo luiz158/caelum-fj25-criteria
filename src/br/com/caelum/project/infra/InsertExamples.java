@@ -22,9 +22,13 @@ public class InsertExamples {
 		
 		Employee john = new Employee();
 		john.setName("John");
+		john.setEmail("john@gmail.com");
+		john.setPhone("12345678");
 		
 		Employee michael = new Employee();
 		michael.setName("michael");
+		michael.setEmail("michael@gmail.com");
+		michael.setPhone("87654321");
 		
 		entityManager.persist(john);
 		entityManager.persist(michael);
